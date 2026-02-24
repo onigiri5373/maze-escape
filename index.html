@@ -6,7 +6,7 @@
 <title>MAZE ESCAPE</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a1a;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:monospace;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
+body{background:#1a2818;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:monospace;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none}
 #wrap{position:relative;display:inline-block}
 canvas{display:block;border:2px solid #334;border-radius:8px}
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;overflow-y:auto}
@@ -104,8 +104,8 @@ canvas{display:block;border:2px solid #334;border-radius:8px}
 
 <script>
 const CELL=26,COLS=15,ROWS=22,TICK_MS=110;
-const COLORS={bg:"#0a0a1a",floor:"#0f1128",wall:"#1a1a3e",player:"#00ff88",coin:"#ffd700",shield:"#00bfff",slow:"#ff69b4",magnet:"#9b59b6",combo:"#ff6600",nearMiss:"#ff4444"};
-const STAGES=[{name:"SURFACE",color:"#4ade80",wallDensity:.22,bg:"#0f1128"},{name:"CAVERN",color:"#60a5fa",wallDensity:.26,bg:"#0a1628"},{name:"ABYSS",color:"#c084fc",wallDensity:.30,bg:"#140a28"},{name:"INFERNO",color:"#f97316",wallDensity:.33,bg:"#1a0f0a"},{name:"VOID",color:"#ef4444",wallDensity:.37,bg:"#1a0a0a"}];
+const COLORS={bg:"#1a2818",floor:"#1a2818",wall:"#6e9b64",player:"#00ff88",coin:"#ffd700",shield:"#00bfff",slow:"#ff69b4",magnet:"#9b59b6",combo:"#ff6600",nearMiss:"#ff4444"};
+const STAGES=[{name:"SURFACE",color:"#4ade80",wallDensity:.22,bg:"#1a2818"},{name:"CAVERN",color:"#60a5fa",wallDensity:.26,bg:"#162030"},{name:"ABYSS",color:"#c084fc",wallDensity:.30,bg:"#201a30"},{name:"INFERNO",color:"#f97316",wallDensity:.33,bg:"#2a1a10"},{name:"VOID",color:"#ef4444",wallDensity:.37,bg:"#2a1210"}];
 const ACHIEVEMENTS=[{id:"first100",name:"初心者卒業",desc:"スコア100達成",check:s=>s.score>=100},{id:"combo10",name:"コンボマスター",desc:"10コンボ達成",check:s=>s.maxCombo>=10},{id:"coins50",name:"ゴールドラッシュ",desc:"コイン50枚収集",check:s=>s.totalCoins>=50},{id:"near5",name:"デンジャラス",desc:"ニアミス5回",check:s=>s.nearMissCount>=5},{id:"stage3",name:"深淵の旅人",desc:"ABYSSに到達",check:s=>s.stageIndex>=2},{id:"score500",name:"伝説",desc:"スコア500達成",check:s=>s.score>=500}];
 
 const cv=document.getElementById("cv");const ctx=cv.getContext("2d");
@@ -300,7 +300,7 @@ function render(ts){
   ctx.fillStyle=st.bg;ctx.fillRect(-5,-5,W+10,H+10);
 
   const startR=s.scrollOffset,endR=startR+ROWS+2;
-  for(let r=startR;r<endR&&r<s.grid.length;r++){const sy=(r-s.scrollOffset)*CELL;if(!s.grid[r])continue;for(let c=0;c<COLS;c++){const sx=c*CELL;if(s.grid[r][c]){const sh=22+((r*7+c*13)%25);ctx.fillStyle=`rgb(${sh+10},${sh},${sh+30})`;ctx.fillRect(sx,sy,CELL,CELL);ctx.fillStyle="rgba(80,80,140,0.12)";ctx.fillRect(sx,sy,CELL,2);ctx.fillRect(sx,sy,2,CELL);}else{ctx.fillStyle=st.bg;ctx.fillRect(sx,sy,CELL,CELL);ctx.strokeStyle="rgba(40,40,80,0.3)";ctx.strokeRect(sx+.5,sy+.5,CELL-1,CELL-1);}}}
+  for(let r=startR;r<endR&&r<s.grid.length;r++){const sy=(r-s.scrollOffset)*CELL;if(!s.grid[r])continue;for(let c=0;c<COLS;c++){const sx=c*CELL;if(s.grid[r][c]){const v=((r*7+c*13)%20);ctx.fillStyle=`rgb(${110+v},${155+v},${100+v})`;ctx.fillRect(sx,sy,CELL,CELL);ctx.fillStyle="rgba(160,210,150,0.3)";ctx.fillRect(sx,sy,CELL,2);ctx.fillRect(sx,sy,2,CELL);}else{ctx.fillStyle=st.bg;ctx.fillRect(sx,sy,CELL,CELL);ctx.strokeStyle="rgba(50,80,50,0.3)";ctx.strokeRect(sx+.5,sy+.5,CELL-1,CELL-1);}}}
 
   // Coins
   s.coins.forEach(coin=>{const cx=coin.c*CELL+CELL/2,cy=(coin.r-s.scrollOffset)*CELL+CELL/2;if(cy<-CELL||cy>H+CELL)return;coin.pulse=(coin.pulse+.08)%(Math.PI*2);const sz=5+Math.sin(coin.pulse)*1.5;const g=ctx.createRadialGradient(cx,cy,1,cx,cy,sz*2.5);g.addColorStop(0,"rgba(255,215,0,0.25)");g.addColorStop(1,"rgba(255,215,0,0)");ctx.fillStyle=g;ctx.fillRect(cx-sz*3,cy-sz*3,sz*6,sz*6);ctx.fillStyle=COLORS.coin;ctx.shadowColor=COLORS.coin;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(cx,cy,sz,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle="#fff8";ctx.beginPath();ctx.arc(cx-1.5,cy-1.5,sz*.4,0,Math.PI*2);ctx.fill();});
