@@ -112,7 +112,7 @@ const cv=document.getElementById("cv");const ctx=cv.getContext("2d");
 cv.width=COLS*CELL;cv.height=ROWS*CELL;
 const $=id=>document.getElementById(id);
 let gameState="title",highScore=0,unlockedAch=new Set(),playerName="",s=null;
-const keys=new Set();let touchStart=null;
+const keys=new Set();let touchStart=null,touchLast=null,touchKeyTimer=null;
 
 // HTML escape
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
@@ -197,12 +197,13 @@ function showAchPopup(a){$("apName").textContent=a.name;$("apDesc").textContent=
 // Input
 window.addEventListener("keydown",e=>{keys.add(e.key);if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();if((e.key===" "||e.key==="Enter")&&gameState!=="playing")startGame();});
 window.addEventListener("keyup",e=>keys.delete(e.key));
-cv.addEventListener("touchstart",e=>{e.preventDefault();touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY};},{passive:false});
+function touchSetDir(dx,dy){const allDir=["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"];allDir.forEach(k=>keys.delete(k));if(touchKeyTimer)clearTimeout(touchKeyTimer);const k=Math.abs(dx)>Math.abs(dy)?(dx>0?"ArrowRight":"ArrowLeft"):(dy>0?"ArrowDown":"ArrowUp");keys.add(k);touchKeyTimer=setTimeout(()=>{keys.delete(k);touchKeyTimer=null;},80);}
+cv.addEventListener("touchstart",e=>{e.preventDefault();const t=e.touches[0];touchStart={x:t.clientX,y:t.clientY};touchLast={x:t.clientX,y:t.clientY};},{passive:false});
+cv.addEventListener("touchmove",e=>{e.preventDefault();if(!touchLast)return;const t=e.touches[0],dx=t.clientX-touchLast.x,dy=t.clientY-touchLast.y;if(Math.abs(dx)>=15||Math.abs(dy)>=15){touchSetDir(dx,dy);touchLast={x:t.clientX,y:t.clientY};}},{passive:false});
 cv.addEventListener("touchend",e=>{e.preventDefault();if(!touchStart)return;const t=e.changedTouches[0],dx=t.clientX-touchStart.x,dy=t.clientY-touchStart.y;
-  if(Math.abs(dx)<10&&Math.abs(dy)<10){if(gameState!=="playing")startGame();else{keys.add("ArrowUp");setTimeout(()=>keys.delete("ArrowUp"),50);}}
-  else if(Math.abs(dx)>Math.abs(dy)){const k=dx>0?"ArrowRight":"ArrowLeft";keys.add(k);setTimeout(()=>keys.delete(k),50);}
-  else{const k=dy>0?"ArrowDown":"ArrowUp";keys.add(k);setTimeout(()=>keys.delete(k),50);}
-  touchStart=null;},{passive:false});
+  if(Math.abs(dx)<8&&Math.abs(dy)<8){if(gameState!=="playing")startGame();else{keys.add("ArrowUp");setTimeout(()=>keys.delete("ArrowUp"),80);}}
+  else touchSetDir(dx,dy);
+  touchStart=null;touchLast=null;},{passive:false});
 
 // Buttons
 $("btnStart").onclick=startGame;
