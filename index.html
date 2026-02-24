@@ -114,6 +114,9 @@ const $=id=>document.getElementById(id);
 let gameState="title",highScore=0,unlockedAch=new Set(),playerName="",s=null;
 const keys=new Set();let touchStart=null;
 
+// HTML escape
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+
 // localStorage helpers
 function loadRankings(){
   try{const d=localStorage.getItem("maze_ranks");if(!d)return[];const arr=JSON.parse(d);const now=Date.now(),week=7*24*60*60*1000;return arr.filter(e=>now-e.time<week).sort((a,b)=>b.score-a.score).slice(0,10);}catch(e){return[];}
@@ -126,7 +129,7 @@ function renderRanks(el){
   if(!ranks.length){el.classList.add("hidden");return;}
   el.classList.remove("hidden");
   const colors=["#ffd700","#c0c0c0","#cd7f32"];
-  el.innerHTML=`<div class="rank-title">👑 WEEKLY RANKING</div><div class="rank-list">${ranks.map((r,i)=>`<div class="rank-row"><span class="rank-num" style="color:${colors[i]||'#888'}">${i+1}</span><span class="rank-name">${r.name||"???"}</span><span class="rank-score">${r.score}</span><span class="rank-coins">💰${r.coins}</span></div>`).join("")}</div>`;
+  el.innerHTML=`<div class="rank-title">👑 WEEKLY RANKING</div><div class="rank-list">${ranks.map((r,i)=>`<div class="rank-row"><span class="rank-num" style="color:${colors[i]||'#888'}">${i+1}</span><span class="rank-name">${esc(r.name||"???")}</span><span class="rank-score">${esc(r.score)}</span><span class="rank-coins">💰${esc(r.coins)}</span></div>`).join("")}</div>`;
 }
 function loadName(){try{return localStorage.getItem("maze_name")||"";}catch(e){return"";}}
 function saveName(n){try{localStorage.setItem("maze_name",n);}catch(e){}}
